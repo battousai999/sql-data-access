@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace BattousaiSqlDataAccess
 {
-    public class Class1
+    public interface ISqlDataCommand
     {
+        int ExecuteNonQuery();
+        Task<int> ExecuteNonQueryAsync();
     }
 }

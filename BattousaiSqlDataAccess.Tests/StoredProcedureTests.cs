@@ -74,5 +74,38 @@ namespace BattousaiSqlDataAccess.Tests
                 int result = await command.ExecuteNonQueryAsync();
             }
         }
+
+        [Fact]
+        public void WhenCreatedWithConnectionThenDoesNotDisposeConnection()
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                var wasDisposed = false;
+
+                using (var command = new StoredProcedure(conn, TestStoredProcedureName))
+                {
+                    conn.Disposed += (sender, args) => { wasDisposed = true; };
+
+                    command.ExecuteNonQuery();
+                }
+
+                Assert.False(wasDisposed);
+            }
+        }
+
+        [Fact]
+        public void WhenCreatedWithoutConnectionThenDisposesConnection()
+        {
+            var wasDisposed = false;
+
+            using (var command = new StoredProcedure(TestStoredProcedureName))
+            {
+                command.Connection.Disposed += (sender, args) => { wasDisposed = true; };
+
+                command.ExecuteNonQuery();
+            }
+
+            Assert.True(wasDisposed);
+        }
     }
 }

@@ -10,18 +10,26 @@ namespace BattousaiSqlDataAccess
 {
     public class StoredProcedure : ISqlDataCommand, IDisposable
     {
+        private readonly bool isManagingConnection;
+
         public SqlParameterCollection Parameters { get; private set; }
-        public SqlConnection Connection { get; set; }
+        public SqlConnection Connection { get; private set; }
 
         public StoredProcedure(string storedProcedureName)
-            : this(new SqlConnection(GetConnectionStringFromCurrentContext()), storedProcedureName)
+            : this(new SqlConnection(GetConnectionStringFromCurrentContext()), storedProcedureName, true)
         {
         }
 
         public StoredProcedure(SqlConnection connection, string storedProcedureName)
+            : this(connection, storedProcedureName, false)
+        {
+        }
+
+        private StoredProcedure(SqlConnection connection, string storedProcedureName, bool isManagingConnection)
         {
             Parameters = new SqlParameterCollection();
             Connection = connection;
+            this.isManagingConnection = isManagingConnection;
         }
 
         private static string GetConnectionStringFromCurrentContext()
@@ -61,7 +69,7 @@ namespace BattousaiSqlDataAccess
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposedValue = false; 
 
         protected virtual void Dispose(bool disposing)
         {
@@ -69,14 +77,14 @@ namespace BattousaiSqlDataAccess
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
+                    if (isManagingConnection)
+                        Connection.Dispose();
                 }
 
                 disposedValue = true;
             }
         }
 
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
             Dispose(true);

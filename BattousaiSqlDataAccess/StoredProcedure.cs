@@ -11,9 +11,11 @@ namespace BattousaiSqlDataAccess
     public class StoredProcedure : ISqlDataCommand, IDisposable
     {
         private readonly bool isManagingConnection;
+        private List<SqlParameterInfo> parameterInfo = new List<SqlParameterInfo>();
 
         public SqlParameterCollection Parameters { get; private set; }
         public SqlConnection Connection { get; private set; }
+        public string Name { get; private set; }
 
         public StoredProcedure(string storedProcedureName)
             : this(new SqlConnection(GetConnectionStringFromCurrentContext()), storedProcedureName, true)
@@ -29,6 +31,7 @@ namespace BattousaiSqlDataAccess
         {
             Parameters = new SqlParameterCollection();
             Connection = connection;
+            this.Name = storedProcedureName;
             this.isManagingConnection = isManagingConnection;
         }
 
@@ -46,14 +49,28 @@ namespace BattousaiSqlDataAccess
         {
             CheckConnection();
 
-            return -1;
+            using (var command = new SqlCommand(Name, Connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+
+                FillParameters(command);
+
+                return command.ExecuteNonQuery();
+            }
         }
 
         public async Task<int> ExecuteNonQueryAsync()
         {
             await CheckConnectionAsync();
 
-            return -1;
+            using (var command = new SqlCommand(Name, Connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+
+                FillParameters(command);
+
+                return await command.ExecuteNonQueryAsync();
+            }
         }
 
         private void CheckConnection()
@@ -66,6 +83,16 @@ namespace BattousaiSqlDataAccess
         {
             if (Connection.State == ConnectionState.Closed)
                 await Connection.OpenAsync();
+        }
+
+        private void FillParameters(SqlCommand command)
+        {
+            SqlCommandBuilder.DeriveParameters(command);
+
+            foreach (var parameter in Parameters)
+            {
+                command.Parameters[parameter.NormalizedName].Value = parameter.Value;
+            }
         }
 
         #region IDisposable Support

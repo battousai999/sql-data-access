@@ -19,10 +19,30 @@ namespace BattousaiSqlDataAccess.Tests
         [Fact]
         public void WhenCreatedWithoutConnectionThenCreatesNewConnection()
         {
+            SqlConnection connection1;
+            SqlConnection connection2;
+
             using (var command = new StoredProcedure(TestStoredProcedureName))
             {
+                connection1 = command.Connection;
+
+                command.Parameters["Parameter1"] = "test";
+                command.Parameters["Parameter2"] = 11;
+
                 command.ExecuteNonQuery();
             }
+
+            using (var command = new StoredProcedure(TestStoredProcedureName))
+            {
+                connection2 = command.Connection;
+
+                command.Parameters["Parameter1"] = "test";
+                command.Parameters["Parameter2"] = 11;
+
+                command.ExecuteNonQuery();
+            }
+
+            Assert.NotSame(connection1, connection2);
         }
 
         [Fact]
@@ -86,6 +106,9 @@ namespace BattousaiSqlDataAccess.Tests
                 {
                     conn.Disposed += (sender, args) => { wasDisposed = true; };
 
+                    command.Parameters["Parameter1"] = "test";
+                    command.Parameters["Parameter2"] = 11;
+
                     command.ExecuteNonQuery();
                 }
 
@@ -101,6 +124,9 @@ namespace BattousaiSqlDataAccess.Tests
             using (var command = new StoredProcedure(TestStoredProcedureName))
             {
                 command.Connection.Disposed += (sender, args) => { wasDisposed = true; };
+
+                command.Parameters["Parameter1"] = "test";
+                command.Parameters["Parameter2"] = 11;
 
                 command.ExecuteNonQuery();
             }

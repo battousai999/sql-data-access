@@ -47,7 +47,6 @@
     <Compile Include="SqlParameter.cs" />
     <Compile Include="SqlParameterCollection.cs" />
     <Compile Include="SqlParameterCollectionAccessor.cs" />
-    <Compile Include="SqlParameterInfo.cs" />
     <Compile Include="StoredProcedure.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

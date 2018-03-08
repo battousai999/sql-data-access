@@ -11,7 +11,6 @@ namespace BattousaiSqlDataAccess
     public class StoredProcedure : ISqlDataCommand, IDisposable
     {
         private readonly bool isManagingConnection;
-        private List<SqlParameterInfo> parameterInfo = new List<SqlParameterInfo>();
 
         public SqlParameterCollection Parameters { get; private set; }
         public SqlConnection Connection { get; private set; }

@@ -22,31 +22,20 @@ namespace BattousaiSqlDataAccess
         {
             get
             {
-                var parameter = parameters.FirstOrDefault(x => AreParameterNamesIsomorphic(parameterName, x.Name));
+                var parameter = parameters.FirstOrDefault(x => SqlParameter.AreParameterNamesIsomorphic(parameterName, x.Name));
 
                 return (parameter == null ? null : parameter.Value);
             }
 
             set
             {
-                var parameter = parameters.FirstOrDefault(x => AreParameterNamesIsomorphic(parameterName, x.Name));
+                var parameter = parameters.FirstOrDefault(x => SqlParameter.AreParameterNamesIsomorphic(parameterName, x.Name));
 
                 if (parameter == null)
                     parameters.Add(new SqlParameter(parameterName, value));
                 else
                     parameter.Value = value;
             }
-        }
-
-        private bool AreParameterNamesIsomorphic(string name1, string name2)
-        {
-            if (name1 != null && name1.StartsWith("@"))
-                name1 = name1.Substring(1);
-
-            if (name2 != null && name2.StartsWith("@"))
-                name2 = name2.Substring(1);
-
-            return StringComparer.CurrentCultureIgnoreCase.Equals(name1, name2);
         }
 
         public SqlParameterCollectionAccessor Add(string parameterName, object value)

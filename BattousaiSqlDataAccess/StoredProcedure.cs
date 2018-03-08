@@ -91,7 +91,8 @@ namespace BattousaiSqlDataAccess
 
             foreach (var parameter in Parameters)
             {
-                command.Parameters[parameter.NormalizedName].Value = parameter.Value;
+                if (SqlParameter.ContainsParameter(command.Parameters, parameter.NormalizedName))
+                    command.Parameters[parameter.NormalizedName].Value = parameter.Value;
             }
         }
 

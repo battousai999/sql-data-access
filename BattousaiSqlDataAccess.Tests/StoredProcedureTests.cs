@@ -133,5 +133,18 @@ namespace BattousaiSqlDataAccess.Tests
 
             Assert.True(wasDisposed);
         }
+
+        [Fact]
+        public void WhenInvokedWithExtraneousParametersThenExecutes()
+        {
+            using (var command = new StoredProcedure(TestStoredProcedureName))
+            {
+                command.Parameters["Parameter1"] = "test";
+                command.Parameters["Parameter2"] = 11;
+                command.Parameters["Parameter3"] = "something-else";
+
+                int result = command.ExecuteNonQuery();
+            }
+        }
     }
 }
